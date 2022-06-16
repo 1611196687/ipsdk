@@ -46,7 +46,7 @@ class InterceptorFactory {
                 String time = System.currentTimeMillis() / 1000 + "";
                 String device_id = MD5Util.md5(DeviceUuidFactory.getInstance((Application) IpContent.mContext).toString() + "app");
                 requestBuilder
-                        .addHeader("platform", "android")
+                        .addHeader("plat", "android")
                         .addHeader("device-id", device_id)
                         .addHeader("time", time + "")
                         .addHeader("version", "1")
