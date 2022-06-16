@@ -5,9 +5,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.alibaba.fastjson.JSON;
-import com.blankj.utilcode.util.LogUtils;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

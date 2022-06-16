@@ -19,7 +19,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.alibaba.fastjson.JSON;
-import com.blankj.utilcode.util.LogUtils;
 import com.github.gzuliyujiang.oaid.DeviceIdentifier;
 import com.google.gson.Gson;
 import com.sdk.ip.bean.InitEntity;
@@ -58,7 +57,6 @@ public class IpContent extends IpUtil {
 
     private int networkType = 1;
     private boolean vpnUsed;
-//    private static String deviceId;
 
     // 位置
     Location location = null;
@@ -109,7 +107,6 @@ public class IpContent extends IpUtil {
 
             @Override
             public void onFailed(int code, String message) {
-                LogUtils.d(code + message);
             }
         });
     }
@@ -294,7 +291,6 @@ public class IpContent extends IpUtil {
                     if (!intf.isUp() || intf.getInterfaceAddresses().size() == 0) {
                         continue;
                     }
-//                    LogUtils.d("-----", "isVpnUsed() NetworkInterface Name: " + intf.getName());
                     if ("tun0".equals(intf.getName()) || "ppp0".equals(intf.getName())) {
                         return true; // The VPN is up
                     }
