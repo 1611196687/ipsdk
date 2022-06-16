@@ -10,6 +10,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.github.gzuliyujiang.oaid.DeviceIdentifier;
 import com.sdk.ip.BuildConfig;
 import com.sdk.ip.IpContent;
 import com.sdk.ip.util.DeviceUuidFactory;
@@ -50,7 +51,7 @@ class InterceptorFactory {
                         .addHeader("time", time + "")
                         .addHeader("version", "1")
                         .addHeader("channel", IpContent.channel)
-//                        .addHeader("oaId", DeviceIdentifier.getOAID(IpContent.mContext))
+                        .addHeader("oaId", DeviceIdentifier.getOAID(IpContent.mContext))
                         .addHeader("androidId", getAndroidId_(IpContent.mContext))
                         .addHeader("user-type", "1")
                         .addHeader("manufacturer", Build.MANUFACTURER)

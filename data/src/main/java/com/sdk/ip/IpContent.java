@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat;
 
 import com.alibaba.fastjson.JSON;
 import com.blankj.utilcode.util.LogUtils;
+import com.github.gzuliyujiang.oaid.DeviceIdentifier;
 import com.google.gson.Gson;
 import com.sdk.ip.bean.InitEntity;
 import com.sdk.ip.bean.IpAddEntity;
@@ -65,8 +66,7 @@ public class IpContent extends IpUtil {
     @Override
     public void init(Context context) {
         this.mContext = context;
-//        DeviceIdentifier.register((Application) context);
-//        deviceId = MD5Util.md5(DeviceUuidFactory.getInstance(mContext).toString() + "app");
+        DeviceIdentifier.register((Application) context);
         getIp_type();
         vpnUsed = isVpnUsed();
     }
@@ -93,7 +93,6 @@ public class IpContent extends IpUtil {
                 String server_ip_list = object.getServer_ip_list();
                 split = server_ip_list.split(",");
                 String agreement = SPUtils.get(mContext, "time", "").toString();
-                LogUtils.d("sp=" + agreement + "");
                 Long time = System.currentTimeMillis() / 1000;
                 if (!agreement.isEmpty()) {
                     if (time - Integer.parseInt(agreement) > Integer.parseInt(object.getSecond())) {
@@ -146,8 +145,7 @@ public class IpContent extends IpUtil {
             }
         }
         map.put("area", area);
-        LogUtils.d("area" + area);
-        LogUtils.d("map" + map);
+        Log.d("area", area);
         String key = CBCUtil.encrypt(JSON.toJSONString(map));
         JavaHttpRequest.getIPInfoAdd(key, new HttpCallback<InitEntity>() {
             @Override
