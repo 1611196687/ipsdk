@@ -17,7 +17,4 @@ IpUtil.getInstance().channel("");(当前app的渠道标识)
 在AndroidManifest.xml中
  <application android:networkSecurityConfig="@xml/network_security_config"></application>
       
-network_security_config.xml内容
-<network-security-config>
-    <base-config cleartextTrafficPermitted="true" />
-</network-security-config>
+network_security_config.xml内容  <base-config cleartextTrafficPermitted="true" />
