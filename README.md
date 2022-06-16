@@ -13,8 +13,6 @@ IpUtil.getInstance().init(baseApp);
 IpUtil.getInstance().loadData(this);
 IpUtil.getInstance().channel("");(当前app的渠道标识)
 
+Android P以后网络访问安全策略升级，限制了非加密的流量请求
 添加res/xml/network_security_config.xml文件名可自拟
-在AndroidManifest.xml中
- <application android:networkSecurityConfig="@xml/network_security_config"></application>
-      
-network_security_config.xml内容  <base-config cleartextTrafficPermitted="true" />
+在AndroidManifest.xml中引用
