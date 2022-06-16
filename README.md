@@ -18,7 +18,6 @@ IpUtil.getInstance().channel("");(当前app的渠道标识)
  <application android:networkSecurityConfig="@xml/network_security_config"></application>
       
 network_security_config.xml内容
-<?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
     <base-config cleartextTrafficPermitted="true" />
 </network-security-config>
