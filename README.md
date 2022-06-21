@@ -10,10 +10,12 @@ dependencies { implementation 'com.github.1611196687:ipsdk:v1.0.4' }
 在BaseApplication初始化
 IpUtil.getInstance().init(baseApp);
 
-填写当前app的渠道标识
+必填 填写当前app的渠道标识
 IpUtil.getInstance().channel("");
-填写密钥内容
+
+必填 填写密钥内容
 IpUtil.getInstance().secretKey("");
+
 在获取定位权限之后调用方法
 IpUtil.getInstance().loadData(this);
 
