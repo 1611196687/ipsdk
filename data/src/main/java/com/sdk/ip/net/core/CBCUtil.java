@@ -11,8 +11,13 @@ import javax.crypto.spec.SecretKeySpec;
 public class CBCUtil {
 
 
-    private static String key = "asdrewqsdfzxcfds";
-    private static String iv1 = "asdrewqsdfzxcfds";
+    private static String key = "";
+    private static String iv1 = "";
+
+    public static void setKey(String keys) {
+        key = keys;
+        iv1 = keys;
+    }
 
     @SuppressLint("NewApi")
     public static String encrypt(String value) {

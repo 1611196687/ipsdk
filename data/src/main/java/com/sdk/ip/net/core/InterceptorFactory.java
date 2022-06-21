@@ -11,14 +11,16 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.github.gzuliyujiang.oaid.DeviceIdentifier;
-import com.sdk.ip.BuildConfig;
 import com.sdk.ip.IpContent;
 import com.sdk.ip.util.DeviceUuidFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-import okhttp3.*;
+import okhttp3.CacheControl;
+import okhttp3.Interceptor;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import static android.content.Context.TELEPHONY_SERVICE;
 

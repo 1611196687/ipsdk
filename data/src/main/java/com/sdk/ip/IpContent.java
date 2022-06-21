@@ -14,6 +14,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -46,6 +47,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static android.content.Context.LOCATION_SERVICE;
+import static android.widget.Toast.LENGTH_SHORT;
 
 public class IpContent extends IpUtil {
 
@@ -84,38 +86,67 @@ public class IpContent extends IpUtil {
             location = getLastKnownLocation();
         }
 
-        JavaHttpRequest.getInitInfo(new HttpCallback<InitEntity>() {
-            @Override
-            public void onSuccess(BaseResponse<InitEntity> response) {
-                object = response.getObject();
-                String server_ip_list = object.getServer_ip_list();
-                split = server_ip_list.split(",");
-                String agreement = SPUtils.get(mContext, "time", "").toString();
-                Long time = System.currentTimeMillis() / 1000;
-                if (!agreement.isEmpty()) {
-                    if (time - Integer.parseInt(agreement) > Integer.parseInt(object.getSecond())) {
+        String agreement = SPUtils.get(mContext, "time", "").toString();
+        String second = SPUtils.get(mContext, "second", "").toString();
+        Log.d("sp=" , second + "");
+        Long time = System.currentTimeMillis() / 1000;
+        if (!second.isEmpty()) {
+            if (time - Integer.parseInt(agreement) > Integer.parseInt(second)) {
+                JavaHttpRequest.getInitInfo(new HttpCallback<InitEntity>() {
+                    @Override
+                    public void onSuccess(BaseResponse<InitEntity> response) {
+                        object = response.getObject();
+                        String server_ip_list = object.getServer_ip_list();
+                        split = server_ip_list.split(",");
                         SPUtils.put(mContext, "time", time + "");
                         getAddIp();
                     }
-                } else {
+
+                    @Override
+                    public void onFailed(int code, String message) {
+                        Log.d("onFailed",code + message);
+                    }
+                });
+            }
+        } else {
+            JavaHttpRequest.getInitInfo(new HttpCallback<InitEntity>() {
+                @Override
+                public void onSuccess(BaseResponse<InitEntity> response) {
+                    object = response.getObject();
+                    String server_ip_list = object.getServer_ip_list();
+                    split = server_ip_list.split(",");
+                    SPUtils.put(mContext, "second", object.getSecond());
                     SPUtils.put(mContext, "time", time + "");
                     getAddIp();
+
                 }
 
-
-            }
-
-            @Override
-            public void onFailed(int code, String message) {
-            }
-        });
+                @Override
+                public void onFailed(int code, String message) {
+                    Log.d("onFailed",code + message);
+                }
+            });
+        }
     }
 
     public static String channel;
 
     @Override
     public void channel(String channel) {
+        if (channel.isEmpty()) {
+            Toast.makeText(mContext,"请填写渠道标识",LENGTH_SHORT).show();
+            return;
+        }
         this.channel = channel;
+    }
+
+    @Override
+    public void secretKey(String key) {
+        if (key.isEmpty()) {
+            Toast.makeText(mContext,"请填写密钥",LENGTH_SHORT).show();
+            return;
+        }
+        CBCUtil.setKey(key);
     }
 
     private void getAddIp() {
@@ -142,7 +173,7 @@ public class IpContent extends IpUtil {
             }
         }
         map.put("area", area);
-        Log.d("area", area);
+        Log.d("map",map.toString());
         String key = CBCUtil.encrypt(JSON.toJSONString(map));
         JavaHttpRequest.getIPInfoAdd(key, new HttpCallback<InitEntity>() {
             @Override
@@ -156,30 +187,54 @@ public class IpContent extends IpUtil {
         getDataip(0);
     }
 
-//    public static String getDeviceId() {
-//        return deviceId;
-//    }
-
-    private void getDataip(final int i) {
+    private void getDataip(int i) {
         if (i < split.length) {
             ip = split[i];
-            TraceRoute.INSTANCE.traceRoute(ip, true);
-            TraceRoute.INSTANCE.setCallback(new TraceRouteCallback() {
-                @Override
-                public void onSuccess(@NotNull TraceRouteResult traceRouteResult) {
-                    ipList = new ArrayList<>();
-                    getIp(traceRouteResult, i);
-//                    getDataip(i + 1);
-                }
+//            try {
+//                InetAddress address = InetAddress.getByName(ip);
+//                if (address instanceof Inet4Address) {
+//                    TraceRoute3 traceRoute3 = new TraceRoute3(ip);
+//                    traceRoute3.execute(new ExecuteCallback() {
+//                        @Override
+//                        public void onExecuting(String content) {
+//                        }
+//
+//                        @Override
+//                        public void onCompleted(String content) {
+//                            Log.d("onCompleted",content);
+//                        }
+//
+//                        @Override
+//                        public void onFinifh(String content) {
+//                            Log.d("onFinifh",content);
+//                            ipList = new ArrayList<>();
+//                            paseStr1(content, ip);
+//                            getIp(i);
+//                        }
+//                    });
+//                } else if (address instanceof Inet6Address) {
+                    TraceRoute.INSTANCE.traceRoute(ip, true);
+                    TraceRoute.INSTANCE.setCallback(new TraceRouteCallback() {
+                        @Override
+                        public void onSuccess(@NotNull TraceRouteResult traceRouteResult) {
+                            Log.d("onSuccess",traceRouteResult.getMessage());
+                            ipList = new ArrayList<>();
+                            getIp(traceRouteResult,i);
+                        }
 
-                @Override
-                public void onUpdate(@NotNull String s) {
-                }
+                        @Override
+                        public void onUpdate(@NotNull String s) {
+                        }
 
-                @Override
-                public void onFailed(int i, @NotNull String s) {
-                }
-            });
+                        @Override
+                        public void onFailed(int i, @NotNull String s) {
+                            Log.d("onFailed",i+s);
+                        }
+                    });
+//                }
+//            } catch (UnknownHostException e) {
+//                e.printStackTrace();
+//            }
         }
     }
 
@@ -263,6 +318,23 @@ public class IpContent extends IpUtil {
         }
     }
 
+    private void paseStr2(String str, String item) {
+        String result = "";
+        String regEx = "\\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:)))(%.+)?\\s*";
+        Pattern p = Pattern.compile(regEx);
+        Matcher m = p.matcher(str);
+        int i = 0;
+        while (m.find()) {
+            i++;
+            result = m.group();
+            if (!result.isEmpty() && !result.equals(item)) {
+                ipList.add(result);
+            }
+            Log.e("---ip", "getIP: " + i + " " + result);
+//break;   加break则提取string中的一个IP
+        }
+    }
+
 
     @Override
     public int getIp_type() {
@@ -291,6 +363,7 @@ public class IpContent extends IpUtil {
                     if (!intf.isUp() || intf.getInterfaceAddresses().size() == 0) {
                         continue;
                     }
+//                    LogUtils.d("-----", "isVpnUsed() NetworkInterface Name: " + intf.getName());
                     if ("tun0".equals(intf.getName()) || "ppp0".equals(intf.getName())) {
                         return true; // The VPN is up
                     }
@@ -336,5 +409,4 @@ public class IpContent extends IpUtil {
         }
         return bestLocation;
     }
-
 }

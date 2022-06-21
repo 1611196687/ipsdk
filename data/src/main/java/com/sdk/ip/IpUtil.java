@@ -1,17 +1,13 @@
 package com.sdk.ip;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
-
-import androidx.annotation.Nullable;
 
 public abstract class IpUtil {
 
     protected static IpUtil instance;
 
-    private String mVersionName = "1.0";
+    private String mVersionName = "1.0.0";
     private int mVersionCode = 1;
 
     public static IpUtil getInstance() {
@@ -29,6 +25,8 @@ public abstract class IpUtil {
     public abstract void loadData(Activity activity);
 
     public abstract void channel(String channel);
+
+    public abstract void secretKey(String key);
 
     public abstract boolean isVpnUsed();
 
